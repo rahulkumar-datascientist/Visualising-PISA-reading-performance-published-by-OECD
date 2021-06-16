@@ -1,0 +1,382 @@
+---
+title: "Data Visualisation  \n &nbsp;  \nAssignment 4   \n &nbsp;  \nVisualising the PISA reading scores"
+author: "Rahul Kumar (20230113)"
+date: "MSc. Data Analytics"
+header-includes:
+  - \usepackage{titling}
+  - \pretitle{\begin{center}
+    \includegraphics[width=2in,height=2in]{logo.jpg}\LARGE\\}
+  - \posttitle{\end{center}}
+output: 
+  pdf_document:
+    toc: true
+    number_sections: true
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+\pagebreak
+
+<!-- # Introduction -->
+<!-- The report visualizes the **PISA** (Programme for International Student Assessment) **reading performance** of 15-year old students, published by **OECD** (Organization for Economic Co-operation and Development) among it's various member states. The dataset is present in the file *OECD_PISA.csv* with the following columns: -->
+
+<!-- - LOCATION : Names of the *member Country* -->
+<!-- - SUBJECT  : The gender of the students, *BOY*, *GIRL*, and *TOT* which provides average of gender. -->
+<!-- - TIME     : The *year* when the data was recorded. -->
+<!-- - Value    : The *reading performance score* as calculated by the organization. -->
+
+# PART 1 : Summary of the visualisation decisions 
+
+The Plot provided in the assignment compares the *PISA reading performance for 2018 between boys and girls*  for the OECD member states. Below is the detailed explanation for the various aspects of the plot.
+
+## Aesthetic Mappings
+
+- The *Boys* and *Girls* data points are mapped to different shapes, allowing us to easily distinguish the genders.
+- The *Boys* and *Girls* *shapes* are then colored using *3 different colors* - The *Average values* for the year 2018 are colored as *black*, The values for *Ireland* are colored as *red*, and rest of the data points are colored with a *dark gray type* color. This is done to attract the reader's attention to the *average* and *Ireland* values and make them stand out for easier comparison with other countries. 
+- The *Boys* and *Girls* data points for a country is connected with a *line segment*. This is done to aid the reader in *visualizing the difference* in score among the gender of a country and compare them easily with other countries.
+
+## Axes
+
+- The x-axis holds *discrete values - country names* and is arranged in *ascending order of Boys reading score*. This is done to communicate a sense of order and keep the plot organized.
+- The x-axis labels are *rotated at an angle* to facilitate easy reading of the country names. The labels text are then *colored same as their data points* to maintain consistency in the plot.
+- The y-axis has a *continuous scale* ranging from *340-560 with an interval of 20 points* and is plotted inside the graph.
+- The Tick marks for x and y-axis are removed.
+
+## Gridlines
+
+- The minor gridlines for x and y axis are removed to avoid cluttering.
+- The major gridlines for x-axis is removed and y-axis is made thin to have a more cleaner plot.
+- A *vertical line segment* is added starting from y=340 going till the datapoint of *Boys* for each country. This acts as a pseudo major gridline at x-axis.  
+
+## Legend
+
+- The legend is shifted to the bottom-left side of the graph.
+- The legend title is removed and the background is colored in white.
+- Only the general colored *Boys* and *Girls* are shown and not the average or Ireland colored datapoints. 
+
+## Other Visual Details
+
+- The plot background is light blue color.
+- The Title and subtitle are written in same line, with font size of title being larger than subtitle.
+- There is a blue line segment plotted at the top of the plot under the title and subtitle.
+
+# PART 2 : Reproducing the Plot
+
+In this section of the report I try to reproduce the plot provided in the assignment. Below is the detailed explanation on each aspect of the plot.
+
+## Explanation
+
+The *OECD_PISA.csv* contains data collected from 2000 - 2018. This plot requires us to use the data-points for *Boys* and *Girls* for the year 2018. Below are the data wrangling steps performed to get the required data.
+
+1. The original country names are extracted by using "countrycode" library, and is used to replace the abbreviated LOCATION present in the dataset.
+2. Some of the LOCATION do not match with the country names in the plot. Used *case_when* to change the LOCATION names to reflect the plot accordingly.
+3. Changed the SUBJECT names from *BOY* to *Boys* and *GIRL* to *Girls* to reflect the plot.
+4. Filter the data for the *year = 2018* where the SUBJECTS are *Boys and Girls*.
+5. Added another 2 columns to reflect the *Boys* and *Girls* score for each country - This is used when adding a *line segment* between the genders and between the base y=340 to each of the boys value per country.
+6. Arranged the filtered dataset in ascending order of the *Boys* column. - This is done to reflect the ordered x-axis.
+7. Added 1 more column which reflects the *color* of x-axis text, i.e. when *LOCATION = 'OECD - Average' use black* or if *LOCATION = 'Ireland' use red*, else use "#7F7F7F".
+8. changed the SUBJECT value for *Ireland and OECD - Average* in-order to have *6 different SUBJECT factors* - namely: *Boys, Boys-avg, Boys-IRL, Girls, Girls-avg, and Girls-IRL*. This is done so that we can color each factor differently as required by the plot.
+9. Finally convert the LOCATION and SUBJECT column to factors as they are discrete variables which are currently represented as vector variables. 
+
+### Aesthetic Mappings
+
+- Used geom_point to map *x-axis with the reordered LOCATION*, *y-axis with the Values(scores)*, and the *SUBJECT* is mapped to *shape, color and fill*.
+- *scaled_shape_manual* to provide the target shape for the SUBJECTS as : **19** for *all 3 Boys* factors and **23** for *all 3 girls* factors.
+- *scaled_color_manual* to provide the target color as: **Boys = "#406D89", Boys-avg = "black", Boys-IRL = "red"** and similarly for girls, girls-avg and girls-IRL.
+- Used *scaled_fill_manual* to color the inside of the data-point. used : **Boys = "#E2EDF3", Boys-avg = "black", Boys-IRL = "red"** and similarly for girls, girls-avg and girls-IRL.
+- adding *line_segment* between each data points of the country's Boys and Girls using *geom_segment* and coloured it as "#C4D2DB". 
+
+### Axes
+
+- The x-axis labels are *rotated at an angle of 45 degree*. 
+- The labels text are then colored same as their data points by using  *PISA_2018$text_Colour[c(T,F)]*. This filters the dataset on text-color column and recycles the value to only pick 1 color for the country value.
+- The y-axis has a *continuous scale* ranging from *340-560 with an interval of 20 points* and is plotted inside the graph by *expanding* the x-axis using *expand(0,2.2)*. This accommodate extra space and avoids overlapping of y axis labels and data-points.
+- The Tick marks for x and y-axis are removed.
+
+### Gridlines
+
+- The minor gridlines for x and y axis are removed to avoid cluttering and the major gridlines for x-axis is removed and y-axis is made thin to have a more cleaner plot.
+- A *vertical line segment* is added starting from y=340 going till the datapoint of *Boys* for each country in white colour. This acts as a pseudo major gridline at x-axis.
+
+### Legend
+
+- The legend title is removed and background is made as white and moved to bottom left corner of the plot using the legend.* function in theme of ggplot.
+- used breaks = c("Boys", "Girls") in all manual_scales to override the legend keys.
+
+### Other visual details
+
+- The background of the plot is "E2EDF3" - a light blue color.
+- The plot title and subtitle uses font : "Times" and are adjusted using hjust and vjust and margin to make it appear in 1 single line.
+- Added a blue line segment at the top of the plot using *annotate* function.
+- **Was not able to recreate the exact plot title and subtitle. Used the font which was closest to the image.**
+
+## Plot
+
+```{r code_P2}
+library(tidyverse)
+library(countrycode)
+
+# read the csv file
+PISA <- read.csv("./OECD_PISA.csv", fileEncoding = "UTF-8-BOM") %>% select(c(1,3,6,7))
+
+# use countrycode library to change the LOCATION names to full name
+PISA$LOCATION <- countrycode(PISA$LOCATION, "iso3c", "country.name")
+
+# mutate the dataset to change the country names and subject levels to match the plot
+PISA <- PISA %>% mutate(LOCATION = case_when( is.na(LOCATION) ~ 'OECD - Average',
+                                     LOCATION == 'Slovakia' ~ 'Slovak Republic',
+                                     LOCATION == 'Czechia'  ~ 'Czech Republic',
+                                     LOCATION == 'South Korea' ~ 'Korea',
+                                     TRUE ~ LOCATION),
+                        SUBJECT = case_when( SUBJECT == 'BOY' ~ 'Boys',
+                                     SUBJECT == 'GIRL' ~ 'Girls',
+                                     TRUE ~ SUBJECT))
+
+# filter 2018 data and add 2 columns Boys and Girls - useful for plotting line
+# segment between the genders for each country
+PISA_2018 <- PISA %>% filter(TIME == 2018, SUBJECT != 'TOT') %>% 
+             group_by(LOCATION) %>% mutate( Boys = Value[SUBJECT == 'Boys'], 
+                                            Girls = Value[SUBJECT == 'Girls']) %>%
+             arrange(Boys) %>%  ungroup()
+
+# add text_colour as a column -- used for assigning x-axis label text color
+PISA_2018 <- mutate(PISA_2018, text_Colour = ifelse(LOCATION == 'Ireland','red',
+                                  ifelse(LOCATION == 'OECD - Average','black','#7F7F7F')))
+
+# change subject levels for Ireland and OECD-Average to have a total of 6 subject levels
+PISA_2018$SUBJECT[PISA_2018$LOCATION == 'Ireland'] <- c('Boys-IRL','Girls-IRL')
+PISA_2018$SUBJECT[PISA_2018$LOCATION == 'OECD - Average'] <- c('Boys-AVG','Girls-AVG')
+
+# convert the SUBJECT and LOCATION columns to factors
+PISA_2018$LOCATION <- factor(PISA_2018$LOCATION, levels =  unique(PISA_2018$LOCATION))
+PISA_2018$SUBJECT <- factor(PISA_2018$SUBJECT)
+
+```
+
+
+```{r plot_P2}
+# geom_point to plot the Boys and Girls datapoints and speciy the visual attributes
+ggplot(PISA_2018) + geom_point(aes(x = LOCATION, y = Value, color = SUBJECT, 
+                                   shape = SUBJECT, fill = SUBJECT), size=1.5) + 
+  
+  # manually specify the shape, fill and color for each of the subject level
+  # using breaks in each function to override the legends
+  # Levels (in order) : Boys  Boys-AVG    Boys-IRL    Girls   Girls-AVG     Girls-IRL
+  scale_shape_manual(values = c(19, 19, 19, 23, 23, 23), breaks = c("Boys", "Girls")) +
+  
+  scale_fill_manual(values = c("#E2EDF3", "black", "red", "#E2EDF3", "black", "red"),
+                    breaks = c("Boys", "Girls")) +
+  
+  scale_color_manual(values = c("#406D89", "black", "red", "#406D89", "black", "red"),
+                     breaks = c("Boys", "Girls")) +
+
+  # pseudo x-axis gridline by joining the points between y=340 and each of the Boys
+  geom_segment(aes(x = LOCATION, y = 340, xend = LOCATION, yend = Boys - 3),
+               colour = "white", size = 0.2) +
+  
+  # joining the Boys and Girls data-points with a line segment for each location
+  geom_segment(aes(x = LOCATION, y = Boys + 3, xend = LOCATION, yend = Girls - 3),
+               colour = "#C4D2DB", size = 0.2) +
+  
+  # drawing a blue line above the plot as shown in image
+  annotate(geom = 'segment', y = Inf, yend = Inf, x = -Inf, xend = Inf, color = 'blue', 
+           size = 0.3) +
+  
+  # specifying axis scales, expanding x-axis to accommodate y-axis text inside the plot 
+  scale_x_discrete(expand=c(0.0,2.2)) + 
+  scale_y_continuous(breaks = seq(340, 560, 20), limits = c(340, 560)) + 
+  
+  # adding Title and subtitle
+  ggtitle(   " Reading performance (PISA)", 
+  subtitle = "Boys / Girls, Mean score, 2018                                                           Source: PISA: Programme for International Student Assessment") +
+  
+  theme(    # adjusting the axis texts and plot title & subtitles
+    axis.text.x = element_text( angle = 45, hjust = 1, size = 6, 
+                                     colour = PISA_2018$text_Colour[c(T,F)]),
+         
+    axis.text.y = element_text(vjust = -0.5,margin = margin(l = 0, r = -20),
+                                    size = 6, colour ="#7F7F7F"), 
+         
+    plot.title = element_text(color = "#615C5C", size = 10, face = "bold", 
+                                   family = "Times", hjust=0, margin = margin(b=-6)),
+         
+    plot.subtitle = element_text(color = "#7F7F7F", size = 6, face = "bold",
+                    hjust = 1, vjust = 10, margin = margin(t=10,b=-6),family = "Times"),
+    
+    # specifying the plot background     
+    panel.background = element_rect(fill = "#E2EDF3"),
+    
+    # adjusting the panel grids   
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_line(size=0.2),
+    
+    # adjusting the legend appearance
+    legend.title = element_blank(),
+    legend.position = "bottom",
+    legend.margin = margin(-5,0,0,-380),
+    legend.key = element_rect(fill = "white"),
+    legend.text = element_text(colour = "#7F7F7F",size = 8),
+    
+    # removing axis ticks and titles
+    axis.ticks = element_blank(),
+    axis.title = element_blank())
+```
+\pagebreak
+
+## Code
+
+```{r eval=FALSE, echo=TRUE, ref.label=c("code_P2","plot_P2")}
+
+```
+
+\pagebreak
+
+# PART 3 : Reading Performance of Countries between 2000-2018
+
+## Explanation
+
+To present the performance of a country I used *Line graph* to show the *trends* of followed by them over the years. To make sure that the data is consistent, I grouped the dataset by *LOCATION & SUBJECT* and calculated the frequency of each. As there are 7 years data, I filtered only those LOCATIONS which had the complete data over the years for both SUBJECTS(Boys & Girls). Once done, I *averaged the Value/PISA scores for each LOCATION* over the 7 years data, and came up with 1 Value for each LOCATION - The average score over the years (OECD-Average is also considered as a LOCATION and is present in the dataset). I arranged them in *descending order to get the ranking of LOCATIONS* and selected top 5 LOCATIONS. 
+
+I plot all target countries with different color and place them in the foreground plot and the remaining LOCATIONS in the background of the plot with a light gray color such that it does not interfere with the target LOCATIONS. I faceted the plot on SUBJECT(Boys and Girls) so that it can be clear how each LOCATION's gender(Boys and Girls) performed over the years and compare them within the top 5 LOCATIONS.
+
+*NOTE : I used the Qualitative Color palettes from DV - Assignment 2 for assigning colors to each of the top 5 Locations.*
+
+## Plot
+
+```{r code_P3}
+
+# group the data by LOCATION & SUBJECT and calculate the frequency. Filter the LOCATIONS
+# having complete data over the years.
+PISA_comp <- PISA %>% filter(SUBJECT != 'TOT') %>% group_by(LOCATION,SUBJECT)%>%
+                 mutate(count = n()) %>% filter(count == 7) %>% ungroup()
+
+# average OECD PISA score for each country over the years
+PISA_country_avg <- PISA_comp %>% group_by(LOCATION) %>%
+                    summarise(Average = mean(Value)) %>%
+                    arrange(desc(Average))
+
+# Top 5 countries which have highest OECD PISA reading average over the years
+# finland, Korea, Canada, New Zealand, Ireland
+target <- top_n(PISA_country_avg,5)$LOCATION 
+
+# add OECD-Average to the target to help comparison.
+target <- c(target, 'OECD - Average')
+
+# subset the data for the target LOCATIONS
+PISA_t5_country <- subset(PISA_comp, LOCATION %in% target)
+
+# add color which is assigned to the top 5 LOCATIONS
+# unique(PISA_t5_country$LOCATION)
+# Canada, Finland, Ireland, Korea, New Zealand, OECD - Average
+colour <- c("#8c9900", "#8b99e9", "#b4d025", "#cb3a7d", "#3c3e3c", "red")
+
+```
+
+
+```{r plot_P3}
+#background plot
+background <- ggplot() +
+  
+  #Background lines must be thin and with alpha = 0.6, color matches part 2 theme
+  geom_line(PISA_comp, mapping = aes(x = TIME, y = Value, group = LOCATION),
+    size = 0.23,
+    color = "#C4D2DB",
+    alpha = 0.6,
+    show.legend = FALSE) +
+  
+  # facet the plot by SUBJECT
+  facet_wrap(~ SUBJECT,scales = "free_y")
+
+# foreground plot
+background +
+  # Add the lines for the top 5 countries
+  geom_line(PISA_t5_country, 
+            mapping = aes(x = TIME, y = Value, colour = LOCATION, group = LOCATION, 
+                          linetype = LOCATION),
+            size = 0.7,alpha = 0.7) +
+  
+  # Manually assign colors, lineType for each LOCATION
+  scale_colour_manual(values = colour) +
+  scale_linetype_manual(values = c(rep("solid",5),"dotted")) +
+  
+  # facet by SUBJECT -> use scale = free_y to add y-axis on both facets
+  facet_wrap( ~ SUBJECT,scales = "free_y") + 
+  
+  # add blue line above the plot - same as part 2
+  annotate(geom = 'segment', y = Inf, yend = Inf, x = -Inf, xend = Inf, color = 'blue', 
+           size = 0.3) +
+  
+  # specifying axis scales - same as plot 1 
+  scale_y_continuous( breaks = seq(340, 600, 20), limits = c(340, 600)) + 
+  scale_x_continuous( breaks = seq(2000, 2018, 3),
+                      labels = seq(2000, 2018, 3),
+                      expand = c(0, 0.1)) +
+  
+  # add plot title and subtitle 
+  ggtitle(   " Reading performance (PISA) from 2000 - 2018", 
+  subtitle = "  Highlighting performance of Top 5 Countries                                                            Source: PISA: Programme for International Student Assessment") + 
+  
+  #Using same theme as part 2
+  theme( # adjusting the axis text, plot title and subtitle appearance 
+    axis.text = element_text( size = 5.5, colour = "#7F7F7F"),
+    
+    plot.title = element_text(color = "#615C5C", size = 11, face = "bold", 
+                              family = "Times", hjust=0),
+         
+    plot.subtitle = element_text(color = "#7F7F7F", size = 7, face = "bold",
+                                 family = "Times"),
+    
+    # specifying plot background
+    panel.background = element_rect(fill = "#E2EDF3"),
+
+    # adjusting panel grids
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_line(size=0.2),
+       
+    # adjusting facets text and background fill
+    strip.background = element_rect(fill = "#5f89a3"),
+    strip.text.x = element_text(face = "bold", size = 8),
+         
+    # adjusting the legend appearance     
+    legend.title = element_blank(),
+    legend.position = "bottom",
+    legend.key = element_rect(fill = "white"),
+    legend.text = element_text(color = "#7F7F7F",size = 8),
+    
+    # removing axis ticks and titles
+    axis.ticks = element_blank(),
+    axis.title = element_blank()) + 
+  
+  # adjusting the legend to make it appear in 1 single row
+  guides(colour = guide_legend(nrow = 1))
+```
+\pagebreak
+
+## Code
+
+```{r eval=FALSE, echo=TRUE, ref.label=c("code_P3","plot_P3")}
+
+```
+
+# References
+
+- Lecture slides
+- GGPLOT2 Notes
+- https://stackoverflow.com/questions/2375587/reorder-levels-of-a-factor-without-changing-order-of-values
+- https://stackoverflow.com/questions/19506630/control-point-border-thickness-in-ggplot
+- https://stackoverflow.com/questions/58380045/plotting-lines-between-two-points-in-ggplot2
+- https://stackoverflow.com/questions/13461829/select-every-other-element-from-a-vector
+- http://search.r-project.org/library/ggplot2/html/expansion.html
+- https://stackoverflow.com/questions/55406829/ggplot-put-axis-text-inside-plot
+- https://www.datanovia.com/en/blog/ggplot-title-subtitle-and-caption/
+- https://stackoverflow.com/questions/46256851/how-to-add-line-at-top-panel-border-of-ggplot2
+- https://stackoverflow.com/questions/30076911/how-do-i-display-only-selected-items-in-a-ggplot2-legend
+- https://www.datanovia.com/en/blog/how-to-change-ggplot-facet-labels/
+- https://stackoverflow.com/questions/36087262/ggplot2-legend-items-in-a-single-horizontal-row
+
+**NOTE : The colors used were selected by an firefox extension: colorPick Eyedropper. - This extension picks the pixel colour from an image and returns HEX value to be used in plots**
